@@ -26,7 +26,7 @@ class BowlingGame {
         val prev = previous.get
         if (prev.isStrike) {
           prev.bonus += pins
-          if (firstRoll && previous.isDefined && prev.previous.get.isStrike) prev.previous.get.bonus += pins
+          if (firstRoll && prev.previous.isDefined && prev.previous.get.isStrike) prev.previous.get.bonus += pins
         }
         else if (prev.isSpare && firstRoll) prev.bonus += pins
       }
@@ -60,33 +60,39 @@ object BowlingGameTest {
     val game2 = new BowlingGame()
     (rolls zip score).foreach { e =>
       game2.roll(e._1)
-      println(game2.score())
-      //assert(e._2 == game2.score())
+      assert(e._2 == game2.score())
     }
   }
 
   def main(args: Array[String]): Unit = {
 
-    //               1         2    3         4         5    6    7     8           9                10
-    val rolls = (4 ~ 4 |  4 ~  4 | 10 |  2 ~  8 |  5 ~  2 | 10 | 10 |  10 |   1 ~   1 |  10 ~   6 ~   3).list
-    val score = (4 ~ 8 | 12 ~ 16 | 26 | 30 ~ 46 | 56 ~ 58 | 68 | 88 | 118 | 121 ~ 123 | 133 ~ 139 ~ 142).list
+    //              1         2    3         4         5    6    7     8           9                10
+    val rolls = 4 ~ 4 I  4 ~  4 I 10 I  2 ~  8 I  5 ~  2 I 10 I 10 I  10 I   1 ~   1 I  10 ~   6 ~   3
+    val score = 4 ~ 8 I 12 ~ 16 I 26 I 30 ~ 46 I 56 ~ 58 I 68 I 88 I 118 I 121 ~ 123 I 133 ~ 139 ~ 142
 
-    test(rolls, score)
+    test(rolls.list, score.list)
 
-    //             1    2    3    4     5     6     7     8     9    10
-    val rolls2 = (10 | 10 | 10 | 10 |  10 |  10 |  10 |  10 |  10 |  10).list
-    val score2 = (10 | 30 | 60 | 90 | 120 | 150 | 180 | 210 | 240 | 270).list
+    //            1    2    3    4     5     6     7     8     9                10
+    val rolls2 = 10 I 10 I 10 I 10 I  10 I  10 I  10 I  10 I  10 I  10 ~  10 ~  10
+    val score2 = 10 I 30 I 60 I 90 I 120 I 150 I 180 I 210 I 240 I 270 ~ 290 ~ 300
 
-    println(rolls2)
-    test(rolls2, score2)
+    test(rolls2.list, score2.list)
+
+    //              1       2       3       4       5       6       7       8       9      10
+    val rolls3 = 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0
+    val score3 = 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0 I 0 ~ 0
+
+    test(rolls3.list, score3.list)
   }
 
   implicit def intToListBuilder(e: Int) : ListBuilder = new ListBuilder(List(e))
 
+  def game(e: Int) = new ListBuilder(List(e))
+
   class ListBuilder(var list : List[Int] = List()) {
     def ~(e : Int) = new ListBuilder(list ::: List(e))
-    def |(e : Int) = this.~(e)
+    def I(e : Int) = this.~(e)
     def ~(e : ListBuilder) = new ListBuilder(list ::: e.list)
-    def |(e : ListBuilder) = this.~(e)
+    def I(e : ListBuilder) = this.~(e)
   }
 }
