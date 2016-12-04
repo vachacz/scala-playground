@@ -3,36 +3,30 @@ class BowlingGameFrames {
 
   class FirstFrame extends Frame(None)
   class LastFrame(previous : Option[Frame]) extends Frame(previous) {
-    var thirdRolled = false
-    override def isComplete = if (isStrike || isSpare) thirdRolled else second.isDefined
-    override def roll(pins : Int) = if (second.isEmpty) super.roll(pins) else bonus += pins
+    override def isComplete = if (isStrike || isSpare) rolls.size == 3 else rolls.size == 2
+    override def roll(pins : Int) = if (rolls.size < 2) super.roll(pins) else bonus += pins
   }
   class Frame(val previous : Option[Frame]) {
     var bonus = 0
-
-    var first : Option[Int] = None
-    var second : Option[Int] = None
+    var rolls = List[Int]()
 
     def roll(pins : Int) = {
-      val firstFrameRoll = first.isEmpty
-      if (firstFrameRoll) first = Some(pins)
-      else second = Some(pins)
+      rolls = rolls :+ pins
 
       if (previous.isDefined) {
-        val prem v = previous.get
+        val prev = previous.get
         if (prev.isStrike) {
           prev.bonus += pins
-          if (firstFrameRoll && prev.previous.isDefined && prev.previous.get.isStrike) prev.previous.get.bonus += pins
+          if (rolls.size == 1 && prev.previous.isDefined && prev.previous.get.isStrike) prev.previous.get.bonus += pins
         }
-        else if (prev.isSpare && firstFrameRoll) prev.bonus += pins
+        else if (prev.isSpare && rolls.size == 1) prev.bonus += pins
       }
     }
 
-    def score = bonus + List(first, second).filter(_.isDefined).map(_.get).sum
-
-    def isSpare = second.isDefined && (first.get + second.get == 10)
-    def isStrike = first.isDefined && first.get == 10
-    def isComplete = isStrike || second.isDefined
+    def score = bonus + rolls.sum
+    def isSpare = rolls.size == 2 && rolls.sum == 10
+    def isStrike = rolls.size == 1 && rolls.sum == 10
+    def isComplete = isStrike || rolls.size == 2
   }
 
   var frames : List[Frame] = List(new FirstFrame())

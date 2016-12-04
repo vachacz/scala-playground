@@ -7,25 +7,25 @@ class BowlingGameEager() {
   var frameShot = 0
   var frameScore = 0
 
-  var multiplier = 0
-  var next_multiplier= 0
+  var bonusMultiplier = 0
+  var nextBonusMultiplier= 0
 
-  var countPins = 1
+  var countPinsIndicator = 1
 
   def roll(pins : Int) = {
     frameShot += 1
     frameScore += pins
 
-    score += pins * (countPins + multiplier)
+    score += pins * (countPinsIndicator + bonusMultiplier)
 
-    multiplier = next_multiplier
-    next_multiplier = 0
+    bonusMultiplier = nextBonusMultiplier
+    nextBonusMultiplier = 0
 
-    if (isStrike || isSpare) multiplier += 1
-    if (isStrike)            next_multiplier += 1
+    if (isStrike || isSpare) bonusMultiplier += 1
+    if (isStrike)            nextBonusMultiplier += 1
 
     if (isFrameComplete) {
-      if (isLastFrame) countPins = 0
+      if (isLastFrame) countPinsIndicator = 0
       frame += 1
       frameShot = 0
       frameScore = 0
