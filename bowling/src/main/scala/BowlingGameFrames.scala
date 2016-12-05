@@ -13,14 +13,12 @@ class BowlingGameFrames {
     def roll(pins : Int) = {
       rolls = rolls :+ pins
 
-      if (previous.isDefined) {
-        val prev = previous.get
-        if (prev.isStrike) {
-          prev.bonus += pins
-          if (rolls.size == 1 && prev.previous.isDefined && prev.previous.get.isStrike) prev.previous.get.bonus += pins
-        }
-        else if (prev.isSpare && rolls.size == 1) prev.bonus += pins
+      if (previous.exists(_.isStrike)) {
+        previous.map(_.bonus += pins)
+        if (rolls.size == 1 && previous.flatMap(_.previous).exists(_.isStrike))
+          previous.flatMap(_.previous).map(_.bonus += pins)
       }
+      else if (previous.exists(_.isSpare) && rolls.size == 1) previous.map(_.bonus += pins)
     }
 
     def score = bonus + rolls.sum
