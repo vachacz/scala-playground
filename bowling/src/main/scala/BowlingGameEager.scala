@@ -1,10 +1,10 @@
 
-class BowlingGameEager() {
+class BowlingGameEager {
 
   var score = 0
   var frame = 1
 
-  var frameShot = 0
+  var frameRoll = 0
   var frameScore = 0
 
   var bonusMultiplier = 0
@@ -13,7 +13,7 @@ class BowlingGameEager() {
   var countPinsIndicator = 1
 
   def roll(pins : Int) = {
-    frameShot += 1
+    frameRoll += 1
     frameScore += pins
 
     score += pins * (countPinsIndicator + bonusMultiplier)
@@ -27,14 +27,13 @@ class BowlingGameEager() {
     if (isFrameComplete) {
       if (isLastFrame) countPinsIndicator = 0
       frame += 1
-      frameShot = 0
+      frameRoll = 0
       frameScore = 0
     }
   }
 
-  def isStrike = frameShot == 1 && frameScore == 10 && frame < 11
-  def isSpare = frameShot == 2 && frameScore == 10 && frame < 11
-  def isFrameComplete = isStrike || frameShot == 2
+  def isStrike = frameRoll == 1 && frameScore == 10 && frame < 11
+  def isSpare = frameRoll == 2 && frameScore == 10 && frame < 11
+  def isFrameComplete = isStrike || frameRoll == 2
   def isLastFrame = frame == 10
-
 }

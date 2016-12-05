@@ -1,11 +1,11 @@
 import org.scalatest._
 
-class BowlingGameArraySpec extends FlatSpec with Matchers with BeforeAndAfterEach {
+class BowlingGameFunctionalSpec extends FlatSpec with Matchers with BeforeAndAfterEach {
 
-  var game : BowlingGameArray = _
+  var game : BowlingGameFunctional = _
 
   override def beforeEach() {
-    game = new BowlingGameArray
+    game = new BowlingGameFunctional
   }
 
   it should "score zero before the game starts" in {
