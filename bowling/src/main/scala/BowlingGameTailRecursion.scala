@@ -8,16 +8,15 @@ class BowlingGameTailRecursion {
 
   def scoreRecursive(score: Int, frame: Int, rolls: List[Int]) : Int = {
     (frame, rolls) match {
-      case (11, _)
-        => score
-      case (_, first :: remainingRolls) if first == 10
-        => scoreRecursive(score + 10 + remainingRolls.take(2).sum, frame + 1, remainingRolls)
-      case (_, first :: second :: remainingRolls) if first + second == 10
-        => scoreRecursive(score + 10 + remainingRolls.head, frame + 1, remainingRolls)
-      case (_, first :: second :: remainingRolls)
-        => scoreRecursive(score + first + second, frame + 1, remainingRolls)
-      case (_, first :: remainingRolls)
-        => scoreRecursive(score + first, frame + 1, remainingRolls)
+      case (11, _) => score
+      case (_, 10 :: tail)
+        => scoreRecursive(score + 10 + tail.take(2).sum, frame + 1, tail)
+      case (_, first :: second :: tail) if first + second == 10
+        => scoreRecursive(score + 10 + tail.head, frame + 1, tail)
+      case (_, first :: second :: tail)
+        => scoreRecursive(score + first + second, frame + 1, tail)
+      case (_, first :: tail)
+        => scoreRecursive(score + first, frame + 1, tail)
       case _ => score
     }
   }

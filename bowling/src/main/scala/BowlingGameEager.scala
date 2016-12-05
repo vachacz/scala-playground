@@ -7,8 +7,8 @@ class BowlingGameEager {
   var frameRoll = 0
   var frameScore = 0
 
-  var bonusMultiplier = 0
-  var nextBonusMultiplier= 0
+  var rollBonus = 0
+  var nextRollBonus = 0
 
   var countPinsIndicator = 1
 
@@ -16,13 +16,13 @@ class BowlingGameEager {
     frameRoll += 1
     frameScore += pins
 
-    score += pins * (countPinsIndicator + bonusMultiplier)
+    score += pins * (countPinsIndicator + rollBonus)
 
-    bonusMultiplier = nextBonusMultiplier
-    nextBonusMultiplier = 0
+    rollBonus = nextRollBonus
+    nextRollBonus = 0
 
-    if (isStrike || isSpare) bonusMultiplier += 1
-    if (isStrike)            nextBonusMultiplier += 1
+    if (isStrike || isSpare) rollBonus += 1
+    if (isStrike)            nextRollBonus += 1
 
     if (isFrameComplete) {
       if (isLastFrame) countPinsIndicator = 0

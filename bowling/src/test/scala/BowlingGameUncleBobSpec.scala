@@ -38,6 +38,13 @@ class BowlingGameUncleBobSpec extends FlatSpec with Matchers with BeforeAndAfter
     game.score should equal(300)
   }
 
+  it should "testSpareInLastFrame" in {
+    rollMany(18, 0)
+    rollSpare()
+    game.roll(2)
+    game.score should equal(12)
+  }
+
   def rollStrike() = game.roll(10)
   def rollSpare() = {
     game.roll(5)
