@@ -110,5 +110,28 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("forall") {
+    new TestSets {
+      val set = union(s1, s2)
+
+      val f1 = (x: Int) => if (x == 1) true else false
+      assert(!FunSets.forall(set, f1))
+
+      val f2 = (x: Int) => if (x == 1 || x == 2) true else false
+      assert(FunSets.forall(set, f2))
+
+      assert(FunSets.exists(set, s1))
+      assert(!FunSets.exists(set, s3))
+
+      val smap = FunSets.map(set, (x: Int) => 10 * x)
+      assert(set(1))
+      assert(set(2))
+
+      assert(!smap(1))
+      assert(!smap(2))
+      assert(smap(10))
+      assert(smap(20))
+    }
+  }
 
 }
