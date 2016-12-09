@@ -22,7 +22,13 @@ object Main {
   /**
     * Exercise 2
     */
-  def balance(chars: List[Char]): Boolean = ???
+  def balance(chars: List[Char], bracesOpen: Int = 0): Boolean = chars match {
+    case Nil => bracesOpen == 0
+    case '(' :: tail => balance(tail, bracesOpen + 1)
+    case ')' :: tail if bracesOpen > 0 => balance(tail, bracesOpen - 1)
+    case ')' :: tail => false
+    case _ :: tail  => balance(tail, bracesOpen)
+  }
 
   /**
     * Exercise 3
