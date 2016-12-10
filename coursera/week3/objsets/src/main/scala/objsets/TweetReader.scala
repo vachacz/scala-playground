@@ -70,9 +70,10 @@ object TweetReader {
   private val siteTweetSetMap: Map[String, TweetSet] =
     Map() ++ (sites zip tweetSets)
 
-  private def unionOfAllTweetSets(curSets: List[TweetSet], acc: TweetSet): TweetSet =
+  private def unionOfAllTweetSets(curSets: List[TweetSet], acc: TweetSet): TweetSet = {
     if (curSets.isEmpty) acc
     else unionOfAllTweetSets(curSets.tail, acc.union(curSets.head))
+  }
 
   val allTweets: TweetSet = unionOfAllTweetSets(tweetSets, new Empty)
 }

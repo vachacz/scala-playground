@@ -1,16 +1,18 @@
 package objsets
 
+import java.util.NoSuchElementException
+
 import org.scalatest.FunSuite
-
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class TweetSetSuite extends FunSuite {
   trait TestSets {
+    val tMax = new Tweet("a", "a body", 20)
+
     val set1 = new Empty
-    val set2 = set1.incl(new Tweet("a", "a body", 20))
+    val set2 = set1.incl(tMax)
     val set3 = set2.incl(new Tweet("b", "b body", 20))
     val c = new Tweet("c", "c body", 7)
     val d = new Tweet("d", "d body", 9)
@@ -68,6 +70,18 @@ class TweetSetSuite extends FunSuite {
       val trends = set5.descendingByRetweet
       assert(!trends.isEmpty)
       assert(trends.head.user == "a" || trends.head.user == "b")
+    }
+  }
+
+  test("most retweets") {
+    new TestSets {
+      assert(set5.mostRetweeted == tMax)
+      try {
+        set1.mostRetweeted == tMax
+        assert(false)
+      } catch {
+        case e: NoSuchElementException => assert(true)
+      }
     }
   }
 
