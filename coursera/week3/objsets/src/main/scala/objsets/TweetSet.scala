@@ -146,7 +146,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   }
 
   def union(that: TweetSet): TweetSet = {
-    ((left union right) union that).incl(elem)
+    (left union (right union that)).incl(elem)
   }
   def isEmpty = false
   /**
@@ -206,7 +206,6 @@ object GoogleVsApple {
     TweetReader.allTweets.filter(tweet  => { google.exists(tweet.text.contains(_)) })
   }
 
-  println(googleTweets)
   lazy val appleTweets: TweetSet = {
     TweetReader.allTweets.filter(tweet => { apple.exists(tweet.text.contains(_)) })
   }
@@ -216,6 +215,7 @@ object GoogleVsApple {
    * sorted by the number of retweets.
    */
   lazy val trending: TweetList = (googleTweets union appleTweets).descendingByRetweet
+
 }
 
 object Main extends App {
