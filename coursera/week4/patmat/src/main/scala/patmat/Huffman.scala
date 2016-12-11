@@ -117,11 +117,12 @@ object Huffman {
     * If `trees` is a list of less than two elements, that list should be returned
     * unchanged.
     */
-  def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
-    case (x: Leaf) :: (y: Leaf) :: xs => Fork(x, y, List(x.char, y.char), x.weight + y.weight) :: xs
-    case (x: Leaf) :: (y: Fork) :: xs => Fork(x, y, x.char :: y.chars, x.weight + y.weight) :: xs
-    case (x: Fork) :: (y: Leaf) :: xs => Fork(x, y, y.char :: x.chars, x.weight + y.weight) :: xs
-    case _ => trees
+  def combine(trees: List[CodeTree]): List[CodeTree] = {
+    val result = trees match {
+      case first :: second :: xs => Fork(first, second, chars(first) ::: chars(second), weight(first) + weight(second)) :: xs
+      case _ => trees
+    }
+    result.sortWith((n1, n2) => weight(n1) < weight(n2))
   }
 
   /**
@@ -153,7 +154,10 @@ object Huffman {
     * frequencies from that text and creates a code tree based on them.
     */
   def createCodeTree(chars: List[Char]): CodeTree = {
-    until(singleton, combine)(makeOrderedLeafList(times(chars)))
+    val leafs = makeOrderedLeafList(times(chars))
+    println(leafs.mkString("\n"))
+
+    until(singleton, combine)(leafs)
   }
 
 
@@ -213,16 +217,6 @@ object Huffman {
     _internal(tree, text)
   }
 
-  def main(args: Array[String]): Unit = {
-    println(decodedSecret.mkString)
-
-    val encoded = encode(frenchCode)("lukasz".toCharArray.toList)
-    val decoded = decode(frenchCode, encoded)
-
-    println(encoded.mkString)
-    println(decoded.mkString)
-  }
-
   // Part 4b: Encoding using code table
 
   type CodeTable = List[(Char, List[Bit])]
@@ -231,7 +225,7 @@ object Huffman {
     * This function returns the bit sequence that represents the character `char` in
     * the code table `table`.
     */
-  def codeBits(table: CodeTable)(char: Char): List[Bit] = ???
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = table.find(_._1 == char).head._2
 
   /**
     * Given a code tree, create a code table which contains, for every character in the
@@ -241,14 +235,22 @@ object Huffman {
     * a valid code tree that can be represented as a code table. Using the code tables of the
     * sub-trees, think of how to build the code table for the entire tree.
     */
-  def convert(tree: CodeTree): CodeTable = ???
+  def convert(tree: CodeTree): CodeTable = {
+    def _convert(remainingTree: CodeTree, bits: List[Bit]): CodeTable = {
+      remainingTree match {
+        case Leaf(c, _) => List((c, bits))
+        case Fork(left, right, _, _) => mergeCodeTables(_convert(left, bits ::: List(0)), _convert(right, bits ::: List(1)))
+      }
+    }
+    _convert(tree, List())
+  }
 
   /**
     * This function takes two code tables and merges them into one. Depending on how you
     * use it in the `convert` method above, this merge method might also do some transformations
     * on the two parameter code tables.
     */
-  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = ???
+  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = a ::: b
 
   /**
     * This function encodes `text` according to the code tree `tree`.
@@ -256,5 +258,27 @@ object Huffman {
     * To speed up the encoding process, it first converts the code tree to a code table
     * and then uses it to perform the actual encoding.
     */
-  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    text.flatMap(codeBits(convert(tree)))
+  }
+
+  def main(args: Array[String]): Unit = {
+
+    val tree = createCodeTree(string2Chars("abecadlo abecadlo abalo cc aa q dsfsd fsd fds dsssssccccc"))
+    println(convert(tree).mkString("\n"))
+
+    println(decodedSecret.mkString)
+
+    val encoded = encode(frenchCode)("lukasz".toCharArray.toList)
+    val decoded = decode(frenchCode, encoded)
+
+    println(encoded.mkString)
+    println(decoded.mkString)
+
+    val quickEncoded = quickEncode(frenchCode)("lukasz".toCharArray.toList)
+    val quickDecoded = decode(frenchCode, encoded)
+
+    println(quickEncoded.mkString)
+    println(quickDecoded.mkString)
+  }
 }
