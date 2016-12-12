@@ -37,7 +37,7 @@ object Anagrams {
   def wordOccurrences(w: Word): Occurrences = w.toLowerCase.groupBy(c => c).mapValues(_.length).toList.sortWith(_._1 < _._1)
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = s.flatMap(wordOccurrences)
+  def sentenceOccurrences(s: Sentence): Occurrences = s.flatMap(wordOccurrences).sortWith(_._1 < _._1)
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
@@ -146,18 +146,27 @@ object Anagrams {
    *  so it has to be returned in this list.
    *
    *  Note: There is only one anagram of an empty sentence.
+    *
+    * FYI: Something is not working as expected. I've added a bunch of traces but still can't get it to work
    */
   // type Sentence = List[Word]
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    def _anagrams(occurrences: Occurrences): List[Sentence] = {
+    def _anagrams(n: String, w: Word, occurrences: Occurrences): List[Sentence] = {
+
+      println(s"${n} ${w} [ ${occurrences.map(_._1).mkString(".")} ]")
       if (occurrences.isEmpty) List(Nil)
       else for {
         combination <- combinations( occurrences )
         word <- dictionaryByOccurrences(combination)
-        sen <- _anagrams(subtract(occurrences, wordOccurrences(word)))
-      } yield word :: sen
+        sen <- _anagrams(n + "  ", word, subtract(occurrences, wordOccurrences(word)))
+      } yield join(n + "  ", word, sen)
     }
 
-    _anagrams(sentenceOccurrences(sentence))
+    def join(tab: String, w: Word, l: List[Word]) = {
+      println(s"${tab} JOIN [${w}] + [${l.mkString(" + ")}]")
+      w :: l
+    }
+
+    _anagrams("", "", sentenceOccurrences(sentence))
   }
 }
